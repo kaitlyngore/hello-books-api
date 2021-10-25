@@ -43,8 +43,10 @@ def list_books():
 
 @books_bp.route("/<book_id>", methods = ["GET", "PUT", "DELETE", "PATCH"])
 def show_book(book_id):
-    # book = Book.query.get(book_id)
-    
+    book_id = int(book_id)
+    book = Book.query.get(book_id)
+    if book is None:
+        return jsonify("Error: book id not found", 404)
     if request.method == "GET":
         book_id = int(book_id)
         book = Book.query.get(book_id)
@@ -62,41 +64,28 @@ def show_book(book_id):
         book_id = int(book_id)
         book = Book.query.get(book_id)
 
-        if book is not None:
-            book.title = request_body["title"]
-            book.description = request_body["description"]
+        book.title = request_body["title"]
+        book.description = request_body["description"]
 
-            db.session.commit()
+        db.session.commit()
 
-            return make_response(f"Book #{book.id} successfully updated")
-
-        else:
-            return make_response("error: book not found", 404)
+        return make_response(f"Book #{book.id} successfully updated")
     
     elif request.method == "DELETE":
-        book_id = int(book_id)
-        book = Book.query.get(book_id)
-        if book is not None:
-            db.session.delete(book)
-            db.session.commit()
+        
+        db.session.delete(book)
+        db.session.commit()
 
-            return make_response(f"Book #{book.id} successfully deleted")
-        else:
-            return make_response("error: book not found", 404)
-
+        return make_response(f"Book #{book.id} successfully deleted")
+        
     elif request.method == "PATCH":
         request_body = request.get_json()
-        book_id = int(book_id)
-        book = Book.query.get(book_id)
-        if book is not None:
-            if "title" in request_body:
-                book.title = request_body["title"]
-                db.session.commit()
-            if "description" in request_body:
-                book.description = request_body["description"]
-                db.session.commit()
+        
+        if "title" in request_body:
+            book.title = request_body["title"]
+            db.session.commit()
+        if "description" in request_body:
+            book.description = request_body["description"]
+            db.session.commit()
 
-            return make_response(f"Book #{book.id} successfully updated")
-
-        else:
-            return make_response("error: book not found", 404)
+        return make_response(f"Book #{book.id} successfully updated")
