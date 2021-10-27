@@ -28,7 +28,16 @@ def list_books():
         return make_response(f"Book {new_book.title} successfully created", 201)
         
     elif request.method == "GET":
-        books = Book.query.all()
+        title_from_url = request.args.get("title")
+        if title_from_url:
+            try:
+                books = Book.query.filter_by(title=title_from_url)
+            except NameError as error:
+                books = Book.query.filter(Book.title.contains(title_from_url))
+
+        else:
+            books = Book.query.all()
+        
         books_response = []
         for book in books:
             books_response.append(
@@ -38,7 +47,8 @@ def list_books():
                     "description": book.description
                 }
             )
-        
+        # if books_response == []:
+            return jsonify(f"Error: title {title_from_url} not found", 404)
         return jsonify(books_response)
 
 @books_bp.route("/<book_id>", methods = ["GET", "PUT", "DELETE", "PATCH"])
