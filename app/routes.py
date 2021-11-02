@@ -2,18 +2,6 @@ from flask import Blueprint, jsonify, request, make_response
 from app import db
 from app.models.book import Book
 
-# class Book:
-#     def __init__(self, id, title, description):
-#         self.id = id
-#         self.title = title
-#         self.description = description
-
-# books = [
-#     Book(1, "Pride and Prejudice", "placeholder description"),
-#     Book(2, "Sense and Sensibility", "placeholder description"),
-#     Book(3, "Persuasion", "placeholder description")
-# ]
-
 books_bp = Blueprint("books", __name__, url_prefix="/books")
 
 @books_bp.route("", methods = ["GET", "POST"])
@@ -47,7 +35,7 @@ def list_books():
                     "description": book.description
                 }
             )
-        # if books_response == []:
+
             return jsonify(f"Error: title {title_from_url} not found", 404)
         return jsonify(books_response)
 
